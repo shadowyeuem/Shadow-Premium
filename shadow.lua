@@ -1,10 +1,17 @@
+_G.AutoTranslate = true
+_G.SaveConfig = true
 repeat task.wait() until game:IsLoaded()
+
+-- PHẢI LOAD FLUENT TRƯỚC KHI DÙNG NHA ANH SHADOW
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
 local CurrentVersion = "1.0.1"
 Fluent:Notify({
     Title = "SHADOW PREMIUM",
     Content = "Đang chạy phiên bản: " .. CurrentVersion,
     Duration = 5
 })
+
 local function JoinTeam()
     local targetTeam = "Pirates"
     if not game.Players.LocalPlayer.Team then
@@ -15,8 +22,6 @@ local function JoinTeam()
 end
 JoinTeam()
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-
 local Window = Fluent:CreateWindow({
     Title = "SHADOW PREMIUM",
     SubTitle = "cre by Kabii",
@@ -26,6 +31,7 @@ local Window = Fluent:CreateWindow({
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.RightControl 
 })
+
 -- [[ BYPASS SYSTEM - SHADOW PREMIUM ]]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -615,40 +621,30 @@ Tabs.Webhook:AddSlider("Web_Delay", {
 
 -- [[ LOGIC SYSTEM - SHADOW PREMIUM ]]
 task.spawn(function()
-    local BaseUrl = "https://raw.githubusercontent.com/shadowyeuem/Shadow-Premium/refs/heads/main/shadow.lua"
-    
-    local function LoadLogic(fileName)
+    local BaseUrl = "https://raw.githubusercontent.com/shadowyeuem/Shadow-Premium/main/"
+    local files = {
+        "Shop.lua", "StatusServer.lua", "LocalPlayer.lua", "SettingFarm.lua", 
+        "Skill.lua", "Farming.lua", "StackFarming.lua", "FarmingOther.lua", 
+        "Dungeon.lua", "SeaEvent.lua", "UpgradeRace.lua", "Items.lua",
+        "Volcano.lua", "ESP.lua", "PVP.lua", "Webhook.lua", "Settings.lua"
+    }
+
+    for _, v in pairs(files) do 
         pcall(function() 
-            loadstring(game:HttpGet(BaseUrl .. fileName))() 
+            local code = game:HttpGet(BaseUrl .. v)
+            if code and code ~= "" then
+                loadstring(code)() 
+            end
         end)
     end
-
-    LoadLogic("Shop.lua")
-    LoadLogic("StatusServer.lua")
-    LoadLogic("LocalPlayer.lua")
-    LoadLogic("SettingFarm.lua")
-    LoadLogic("Skill.lua")
-    LoadLogic("Farming.lua")
-    LoadLogic("StackFarming.lua")
-    LoadLogic("FarmingOther.lua")
-    LoadLogic("Dungeon.lua")
-    LoadLogic("SeaEvent.lua")
-    LoadLogic("UpgradeRace.lua")
-    LoadLogic("Items.lua")
-    LoadLogic("Volcano.lua")
-    LoadLogic("ESP.lua")
-    LoadLogic("PVP.lua")
-    LoadLogic("Webhook.lua")
-    LoadLogic("Settings.lua")
-
-    print("SHADOW PREMIUM: Tat ca 17 Logic da duoc nap!")
+    print("SHADOW PREMIUM: He thong da san sang!")
 end)
 
--- [[ END KẾT THÚC FILE]]
+-- [[ KÍCH HOẠT GIAO DIỆN ]]
 Fluent:SetTheme("Darker")
 Window:SelectTab(Tabs.StatusServer)
+
 for _, tab in pairs(Tabs) do
-    tab:AddSection(" ") 
     tab:AddSection("— SHADOW PREMIUM —") 
 end
 
