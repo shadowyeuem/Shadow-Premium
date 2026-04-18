@@ -637,15 +637,21 @@ task.spawn(function()
             end
         end)
     end
-    print("SHADOW PREMIUM: He thong da san sang!")
 end)
 
--- [[ KÍCH HOẠT GIAO DIỆN ]]
+-- [[ KÍCH HOẠT GIAO DIỆN & FIX THANH CUỘN ]]
 Fluent:SetTheme("Darker")
 Window:SelectTab(Tabs.StatusServer)
 
+-- Vòng lặp này phải bọc cả AddSection và AddParagraph thì mới Ok nha anh
 for _, tab in pairs(Tabs) do
     tab:AddSection("— SHADOW PREMIUM —") 
+    -- Thêm hẳn 15 dòng trống cho anh trượt mỏi tay trên điện thoại luôn
+    for i = 1, 15 do
+        tab:AddParagraph({
+            Title = "",
+            Content = ""
+        })
+    end
 end
-
 
