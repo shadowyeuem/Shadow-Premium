@@ -615,7 +615,7 @@ Tabs.Webhook:AddSlider("Web_Delay", {
 
 -- [[ LOGIC SYSTEM - SHADOW PREMIUM ]]
 task.spawn(function()
-    local BaseUrl = "https://github.com/shadowyeuem/Shadow-Premium/raw/refs/heads/main/"
+    local BaseUrl = "https://raw.githubusercontent.com/shadowyeuem/Shadow-Premium/refs/heads/main/shadow.lua"
     
     local function LoadLogic(fileName)
         pcall(function() 
