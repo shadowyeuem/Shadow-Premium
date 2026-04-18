@@ -615,56 +615,31 @@ Tabs.Webhook:AddSlider("Web_Delay", {
 
 -- [[ LOGIC SYSTEM - SHADOW PREMIUM ]]
 task.spawn(function()
-    -- 1. Logic Shop
-    pcall(function() loadstring(game:HttpGet("Link_Code_Shop_Logic"))() end)
+    local BaseUrl = "https://github.com/shadowyeuem/Shadow-Premium/raw/refs/heads/main/"
     
-    -- 2. Logic Status & Server
-    pcall(function() loadstring(game:HttpGet("Link_Code_StatusServer_Logic"))() end)
-    
-    -- 3. Logic LocalPlayer (Chạy nhanh, Nhảy cao...)
-    pcall(function() loadstring(game:HttpGet("Link_Code_LocalPlayer_Logic"))() end)
-    
-    -- 4. Logic Setting Farm
-    pcall(function() loadstring(game:HttpGet("Link_Code_SettingFarm_Logic"))() end)
-    
-    -- 5. Logic Skill
-    pcall(function() loadstring(game:HttpGet("Link_Code_Skill_Logic"))() end)
-    
-    -- 6. Logic Farming (Main Farm)
-    pcall(function() loadstring(game:HttpGet("Link_Code_Farming_Logic"))() end)
-    
-    -- 7. Logic Stack Farming
-    pcall(function() loadstring(game:HttpGet("Link_Code_StackFarming_Logic")) end)
-    
-    -- 8. Logic Farming Other
-    pcall(function() loadstring(game:HttpGet("Link_Code_FarmingOther_Logic"))() end)
-    
-    -- 9. Logic Dungeon (Raid)
-    pcall(function() loadstring(game:HttpGet("Link_Code_Dungeon_Logic"))() end)
-    
-    -- 10. Logic Sea Event
-    pcall(function() loadstring(game:HttpGet("Link_Code_SeaEvent_Logic"))() end)
-    
-    -- 11. Logic Upgrade Race (V4, Mirage...)
-    pcall(function() loadstring(game:HttpGet("Link_Code_UpgradeRace_Logic"))() end)
-    
-    -- 12. Logic Items (Võ, Kiếm)
-    pcall(function() loadstring(game:HttpGet("Link_Code_Items_Logic"))() end)
-    
-    -- 13. Logic Volcano Event
-    pcall(function() loadstring(game:HttpGet("Link_Code_Volcano_Logic"))() end)
-    
-    -- 14. Logic ESP
-    pcall(function() loadstring(game:HttpGet("Link_Code_ESP_Logic"))() end)
-    
-    -- 15. Logic PVP
-    pcall(function() loadstring(game:HttpGet("Link_Code_PVP_Logic"))() end)
-    
-    -- 16. Logic Webhook (Discord)
-    pcall(function() loadstring(game:HttpGet("Link_Code_Webhook_Logic"))() end)
-    
-    -- 17. Logic Settings
-    pcall(function() loadstring(game:HttpGet("Link_Code_Settings_Logic"))() end)
+    local function LoadLogic(fileName)
+        pcall(function() 
+            loadstring(game:HttpGet(BaseUrl .. fileName))() 
+        end)
+    end
+
+    LoadLogic("Shop.lua")
+    LoadLogic("StatusServer.lua")
+    LoadLogic("LocalPlayer.lua")
+    LoadLogic("SettingFarm.lua")
+    LoadLogic("Skill.lua")
+    LoadLogic("Farming.lua")
+    LoadLogic("StackFarming.lua")
+    LoadLogic("FarmingOther.lua")
+    LoadLogic("Dungeon.lua")
+    LoadLogic("SeaEvent.lua")
+    LoadLogic("UpgradeRace.lua")
+    LoadLogic("Items.lua")
+    LoadLogic("Volcano.lua")
+    LoadLogic("ESP.lua")
+    LoadLogic("PVP.lua")
+    LoadLogic("Webhook.lua")
+    LoadLogic("Settings.lua")
 
     print("SHADOW PREMIUM: Tat ca 17 Logic da duoc nap!")
 end)
