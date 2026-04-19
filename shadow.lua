@@ -45,7 +45,7 @@ pcall(function()
     end)
 end)
 
-local Tabs = {
+Tabs = {
     Shop = Window:AddTab({ Title = "Shop", Icon = "shopping-cart" }),
     StatusServer = Window:AddTab({ Title = "Status And Server", Icon = "server" }),
     LocalPlayer = Window:AddTab({ Title = "LocalPlayer", Icon = "user" }),
@@ -510,8 +510,27 @@ Tabs.Webhook:AddButton({
     Title = "Test Webhook",
     Description = "Gửi thử một thông báo đến Discord để kiểm tra",
     Callback = function()
-        -- Logic gửi test message
-        print("Đang gửi tin nhắn thử nghiệm...")
+        local url = _G.Webhook_URL
+        if url == "" or not url then 
+            return Fluent:Notify({Title = "Lỗi", Content = "Vui lòng dán link Webhook!", Duration = 3}) 
+        end
+        
+        local data = {
+            ["embeds"] = {{
+                ["title"] = "🚀 SHADOW PREMIUM - TEST SUCCESS",
+                ["description"] = "Kết nối thành công cho: " .. game.Players.LocalPlayer.Name,
+                ["color"] = 0x00FF00
+            }}
+        }
+        
+        local response = (syn and syn.request or http_request or request or HttpService.Request)({
+            Url = url,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = game:GetService("HttpService"):JSONEncode(data)
+        })
+        
+        Fluent:Notify({Title = "Webhook", Content = "Đã gửi tin nhắn kiểm tra!", Duration = 3})
     end
 })
 
@@ -558,6 +577,31 @@ task.spawn(function()
             if code and code ~= "" then
                 loadstring(code)() 
             end
+        end)
+    end
+end)
+-- [[ CONFIG SYSTEM - LƯU TÙY CHỌN CHO ANH SHADOW ]]
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+-- Đặt tên thư mục lưu script của anh
+SaveManager:SetIgnoreIndexes({})
+SaveManager:IgnoreThemeSettings()
+
+-- Tự động nạp cấu hình khi vừa mở script
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+SaveManager:LoadAutoloadConfig() 
+
+-- Thiết lập để mỗi khi anh tích vào nút nào đó, nó sẽ tự nhớ
+task.spawn(function()
+    while task.wait(5) do -- Cứ 5 giây tự lưu một lần cho chắc
+        pcall(function()
+            SaveManager:Save(SaveManager:GetConfigsList()[1] or "Shadow_Premium_Config")
         end)
     end
 end)
