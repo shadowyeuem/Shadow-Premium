@@ -34,12 +34,7 @@ local Window = Fluent:CreateWindow({
 
 -- [[ BYPASS SYSTEM - SHADOW PREMIUM ]]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 pcall(function()
-    hookfunction(require(ReplicatedStorage.Effect.Container.Death), function()
-        return nil
-    end)
-    
     hookfunction(require(ReplicatedStorage.Effect.Container.Respawn), function()
         return nil
     end)
@@ -506,23 +501,34 @@ Tabs.Webhook:AddInput("WebhookURL", {
     end
 })
 
+-- [[ NÚT SEND WEBHOOK - ĐÃ CÀI ĐẶT LOGIC THEO Ý ANH SHADOW ]]
 Tabs.Webhook:AddButton({
-    Title = "Test Webhook",
-    Description = "Gửi thử một thông báo đến Discord để kiểm tra",
+    Title = "Send Report Now",
+    Description = "Gửi thông số nhân vật hiện tại về Discord ngay lập tức",
     Callback = function()
         local url = _G.Webhook_URL
         if url == "" or not url then 
-            return Fluent:Notify({Title = "Lỗi", Content = "Vui lòng dán link Webhook!", Duration = 3}) 
+            return Fluent:Notify({Title = "Lỗi", Content = "Anh chưa dán link Webhook vào ô ở trên kìa!", Duration = 3}) 
         end
         
+        local p = game.Players.LocalPlayer
         local data = {
             ["embeds"] = {{
-                ["title"] = "🚀 SHADOW PREMIUM - TEST SUCCESS",
-                ["description"] = "Kết nối thành công cho: " .. game.Players.LocalPlayer.Name,
-                ["color"] = 0x00FF00
+                ["title"] = "📩 SHADOW PREMIUM - BÁO CÁO THỦ CÔNG",
+                ["description"] = string.format(
+                    "👤 **Người chơi:** %s\n📊 **Cấp độ:** %s\n💵 **Beli:** %s\n✨ **Fragment:** %s\n🏴‍☠️ **Bounty:** %s",
+                    p.Name, 
+                    tostring(p.Data.Level.Value), 
+                    tostring(p.Data.Beli.Value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", ""),
+                    tostring(p.Data.Fragments.Value),
+                    tostring(p.leaderstats["Bounty/Honor"].Value)
+                ),
+                ["color"] = 0x00A2FF,
+                ["footer"] = {["text"] = "Gửi lúc: " .. os.date("%X")}
             }}
         }
         
+        -- Gửi đi
         local response = (syn and syn.request or http_request or request or HttpService.Request)({
             Url = url,
             Method = "POST",
@@ -530,7 +536,7 @@ Tabs.Webhook:AddButton({
             Body = game:GetService("HttpService"):JSONEncode(data)
         })
         
-        Fluent:Notify({Title = "Webhook", Content = "Đã gửi tin nhắn kiểm tra!", Duration = 3})
+        Fluent:Notify({Title = "Webhook", Content = "Đã gửi báo cáo về Discord rồi nhé anh!", Duration = 3})
     end
 })
 
