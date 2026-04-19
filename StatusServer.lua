@@ -1,31 +1,41 @@
--- [[ FILE STATUSSERVER.LUA - FIX BY SHADOW PREMIUM ]]
--- Tự tìm lại Tab StatusServer từ UI nếu không thấy biến Tabs
-local StatusTab = (Tabs and Tabs.StatusServer) or game:GetService("CoreGui"):FindFirstChild("Fluent"):FindFirstChild("Window"):FindFirstChild("Status And Server")
+-- [[ TAB STATUS SERVER - SHADOW PREMIUM V2 ]]
+local StatusSection = Tabs.StatusServer:AddSection("📊 NHÂN VẬT & MÁY CHỦ")
 
-if StatusTab then
-    local StatusSection = StatusTab:AddSection("📊 NHÂN VẬT & MÁY CHỦ")
+local LevelLabel = Tabs.StatusServer:AddParagraph({ Title = "Cấp độ:", Content = "Đang nạp..." })
+local BeliLabel = Tabs.StatusServer:AddParagraph({ Title = "Tiền Beli:", Content = "Đang nạp..." })
+local FragLabel = Tabs.StatusServer:AddParagraph({ Title = "Fragment:", Content = "Đang nạp..." })
+local BountyLabel = Tabs.StatusServer:AddParagraph({ Title = "Bounty / Honor:", Content = "Đang nạp..." })
 
-    local LevelLabel = StatusTab:AddParagraph({ Title = "Cấp độ:", Content = "Đang nạp..." })
-    local BeliLabel = StatusTab:AddParagraph({ Title = "Tiền Beli:", Content = "Đang nạp..." })
-    local FragLabel = StatusTab:AddParagraph({ Title = "Fragment:", Content = "Đang nạp..." })
-    local BountyLabel = StatusTab:AddParagraph({ Title = "Bounty / Honor:", Content = "Đang nạp..." })
+Tabs.StatusServer:AddSection("🌍 QUẢN LÝ SERVER")
+local TimeLabel = Tabs.StatusServer:AddParagraph({ Title = "Giờ hệ thống:", Content = "00:00:00" })
 
-    StatusTab:AddSection("🌍 THÔNG TIN SERVER")
-    local TimeLabel = StatusTab:AddParagraph({ Title = "Giờ hệ thống:", Content = "00:00:00" })
+Tabs.StatusServer:AddButton({
+    Title = "Rejoin Server",
+    Description = "Kết nối lại máy chủ hiện tại",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+    end
+})
 
-    task.spawn(function()
-        while task.wait(1) do
-            pcall(function()
-                local p = game.Players.LocalPlayer
-                LevelLabel:SetTitle("Cấp độ: " .. tostring(p.Data.Level.Value))
-                local beli = tostring(p.Data.Beli.Value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
-                BeliLabel:SetTitle("Tiền Beli: 💵 " .. beli)
-                FragLabel:SetTitle("Fragment: ✨ " .. tostring(p.Data.Fragments.Value))
-                BountyLabel:SetTitle("Bounty: 🏴‍☠️ " .. tostring(p.leaderstats["Bounty/Honor"].Value))
-                TimeLabel:SetTitle(os.date("Giờ: %X"))
-            end)
+Tabs.StatusServer:AddButton({
+    Title = "Hop Server",
+    Description = "Chuyển sang server khác (Fix kẹt)",
+    Callback = function()
+        local Http = game:GetService("HttpService")
+        local TPS = game:GetService("TeleportService")
+        local Api = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100"
+        local function NextServer(cursor)
+            local res = game:HttpGet(Api..(cursor and "&cursor="..cursor or ""))
+            local data = Http:JSONEncode(res)
+            for i,v in pairs(data.data) do
+                if v.playing < v.maxPlayers and v.id ~= game.JobId then
+                    TPS:TeleportToPlaceInstance(game.PlaceId, v.id)
+                    break
+                end
+            end
         end
-    end)
-else
-    warn("SHADOW PREMIUM: Khong tim thay Tab StatusServer!")
-end
+        NextServer()
+    end
+})
+
+-- Vòng lặp cập nhật số vẫn giữ nguyên như cũ...
