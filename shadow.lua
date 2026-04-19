@@ -643,15 +643,17 @@ end)
 Fluent:SetTheme("Darker")
 Window:SelectTab(Tabs.StatusServer)
 
--- Vòng lặp này phải bọc cả AddSection và AddParagraph thì mới Ok nha anh
+-- Vòng lặp tối ưu theo ý anh Shadow
 for _, tab in pairs(Tabs) do
     tab:AddSection("— SHADOW PREMIUM —") 
-    -- Thêm hẳn 15 dòng trống cho anh trượt mỏi tay trên điện thoại luôn
-    for i = 1, 15 do
-        tab:AddParagraph({
-            Title = "",
-            Content = ""
-        })
+    -- Giảm xuống còn 3 ô trắng bên phải chức năng cho đỡ trống trải
+    for i = 1, 3 do
+        tab:AddSection(" ") 
     end
 end
+
+-- FIX RIÊNG CHO THANH TAB BÊN TRÁI (SIDEBAR)
+-- Thêm khoảng trắng vào cuối Sidebar để anh trượt tới tab Setting dễ dàng
+local DummyTab = Window:AddTab({ Title = " ", Icon = "" })
+local DummyTab2 = Window:AddTab({ Title = " ", Icon = "" })
 
