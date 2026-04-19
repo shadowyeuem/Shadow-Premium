@@ -1,38 +1,33 @@
--- [[ TAB STATUS SERVER - SHADOW PREMIUM ]]
-local StatusSection = Tabs.StatusServer:AddSection("📊 NHÂN VẬT & MÁY CHỦ")
+-- [[ FILE STATUSSERVER.LUA - SHADOW PREMIUM ]]
+-- Lưu ý: Không được khai báo lại biến 'Tabs' mới, mà phải dùng biến từ file chính nạp qua
+local StatusTab = Tabs.StatusServer 
 
--- Tạo khung hiển thị thông tin bằng Paragraph cho chuyên nghiệp
-local LevelLabel = Tabs.StatusServer:AddParagraph({ Title = "Cấp độ:", Content = "Đang nạp..." })
-local BeliLabel = Tabs.StatusServer:AddParagraph({ Title = "Tiền Beli:", Content = "Đang nạp..." })
-local FragLabel = Tabs.StatusServer:AddParagraph({ Title = "Fragment:", Content = "Đang nạp..." })
-local BountyLabel = Tabs.StatusServer:AddParagraph({ Title = "Bounty / Honor:", Content = "Đang nạp..." })
+local StatusSection = StatusTab:AddSection("📊 NHÂN VẬT & MÁY CHỦ")
 
-Tabs.StatusServer:AddSection("🌍 THÔNG TIN SERVER")
-local TimeLabel = Tabs.StatusServer:AddParagraph({ Title = "Giờ hệ thống:", Content = "00:00:00" })
-local JobIDLabel = Tabs.StatusServer:AddParagraph({ Title = "Job ID:", Content = game.JobId })
+-- Tạo khung hiển thị thông tin bằng Paragraph
+local LevelLabel = StatusTab:AddParagraph({ Title = "Cấp độ:", Content = "Đang nạp..." })
+local BeliLabel = StatusTab:AddParagraph({ Title = "Tiền Beli:", Content = "Đang nạp..." })
+local FragLabel = StatusTab:AddParagraph({ Title = "Fragment:", Content = "Đang nạp..." })
+local BountyLabel = StatusTab:AddParagraph({ Title = "Bounty / Honor:", Content = "Đang nạp..." })
 
--- [[ VÒNG LẶP CẬP NHẬT THÔNG SỐ REAL-TIME ]]
+StatusTab:AddSection("🌍 THÔNG TIN SERVER")
+local TimeLabel = StatusTab:AddParagraph({ Title = "Giờ hệ thống:", Content = "00:00:00" })
+local JobIDLabel = StatusTab:AddParagraph({ Title = "Job ID:", Content = game.JobId })
+
+-- [[ VÒNG LẶP CẬP NHẬT REAL-TIME ]]
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
             local p = game.Players.LocalPlayer
-            local data = p.Data
-            
-            -- Cập nhật Level
-            LevelLabel:SetTitle("Cấp độ: " .. tostring(data.Level.Value))
-            
-            -- Cập nhật Tiền (Thêm dấu phẩy cho sang)
-            local beli = tostring(data.Beli.Value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+            -- Cập nhật số liệu nhân vật
+            LevelLabel:SetTitle("Cấp độ: " .. tostring(p.Data.Level.Value))
+            local beli = tostring(p.Data.Beli.Value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
             BeliLabel:SetTitle("Tiền Beli: 💵 " .. beli)
-            
-            -- Cập nhật Fragment & Bounty
-            FragLabel:SetTitle("Fragment: ✨ " .. tostring(data.Fragments.Value))
+            FragLabel:SetTitle("Fragment: ✨ " .. tostring(p.Data.Fragments.Value))
             BountyLabel:SetTitle("Bounty: 🏴‍☠️ " .. tostring(p.leaderstats["Bounty/Honor"].Value))
-            
-            -- Cập nhật Giờ
+            -- Cập nhật giờ
             local t = os.date("!*t")
             TimeLabel:SetTitle(string.format("Giờ: %02d:%02d:%02d", t.hour, t.min, t.sec))
         end)
     end
 end)
-
