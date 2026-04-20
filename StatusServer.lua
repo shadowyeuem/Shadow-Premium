@@ -1,61 +1,65 @@
--- [[ TAB WEBHOOK - SHADOW PREMIUM ULTIMATE ]]
-local WebhookSection = Tabs.Webhook:AddSection("📢 CẤU HÌNH THÔNG BÁO DISCORD")
+-- [[ TAB STATUS SERVER - SHADOW PREMIUM ULTIMATE V3 ]]
+local StatusSection = Tabs.StatusServer:AddSection("📊 THÔNG SỐ CHI TIẾT")
 
--- Ô nhập Link Webhook (Tự động lưu nhờ biến _G)
-Tabs.Webhook:AddInput("WebhookURL", {
-    Title = "Discord Webhook URL",
-    Default = _G.Webhook_URL or "",
-    Placeholder = "Dán link Webhook của anh vào đây...",
-    Callback = function(Value)
-        _G.Webhook_URL = Value
-    end
+local LevelLabel = Tabs.StatusServer:AddParagraph({ Title = "Cấp độ:", Content = "Đang nạp..." })
+local BeliLabel = Tabs.StatusServer:AddParagraph({ Title = "Tiền Beli:", Content = "Đang nạp..." })
+local FragLabel = Tabs.StatusServer:AddParagraph({ Title = "Fragment:", Content = "Đang nạp..." })
+local BountyLabel = Tabs.StatusServer:AddParagraph({ Title = "Bounty:", Content = "Đang nạp..." })
+
+Tabs.StatusServer:AddSection("🏝️ RADAR ĐẢO & DIMENSION (HÌNH ANH GỬI)")
+local MirageLabel = Tabs.StatusServer:AddParagraph({ Title = "Mirage Island:", Content = "❌ Chưa xuất hiện" })
+local VolcanoLabel = Tabs.StatusServer:AddParagraph({ Title = "Volcano Event:", Content = "❌ Chưa có" })
+local FrozenLabel = Tabs.StatusServer:AddParagraph({ Title = "Frozen Dimension:", Content = "❌ Đang đóng" })
+local SeaLabel = Tabs.StatusServer:AddParagraph({ Title = "Quái biển (Sea):", Content = "Đang quét..." })
+
+Tabs.StatusServer:AddSection("⚔️ BOSS & EVENT")
+local CakeLabel = Tabs.StatusServer:AddParagraph({ Title = "Cake Prince:", Content = "0/500" })
+local MobLabel = Tabs.StatusServer:AddParagraph({ Title = "Mob Farm:", Content = "0" })
+
+Tabs.StatusServer:AddSection("🌍 SERVER")
+local TimeLabel = Tabs.StatusServer:AddParagraph({ Title = "Giờ:", Content = "00:00:00" })
+
+Tabs.StatusServer:AddButton({
+    Title = "Rejoin Server",
+    Callback = function() game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer) end
 })
 
--- Nút gửi báo cáo đầy đủ thông tin (Level, Beli, Fragment, Bounty)
-Tabs.Webhook:AddButton({
-    Title = "Gửi Báo Cáo Ngay",
-    Description = "Bắn thông số nhân vật hiện tại về Discord",
-    Callback = function()
-        local url = _G.Webhook_URL
-        if url == "" or not url then 
-            return Fluent:Notify({Title = "Lỗi", Content = "Anh chưa dán link Webhook kìa!", Duration = 3}) 
-        end
-        
-        local p = game.Players.LocalPlayer
-        local data = {
-            ["embeds"] = {{
-                ["title"] = "📩 SHADOW PREMIUM - BÁO CÁO NHÂN VẬT",
-                ["description"] = string.format(
-                    "👤 **Tên:** %s\n📊 **Cấp độ:** %s\n💵 **Beli:** %s\n✨ **Fragment:** %s\n🏴‍☠️ **Bounty:** %s",
-                    p.Name, 
-                    tostring(p.Data.Level.Value), 
-                    tostring(p.Data.Beli.Value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", ""),
-                    tostring(p.Data.Fragments.Value),
-                    tostring(p.leaderstats["Bounty/Honor"].Value)
-                ),
-                ["color"] = 0x00A2FF,
-                ["footer"] = {["text"] = "Gửi lúc: " .. os.date("%X")}
-            }}
-        }
-        
-        request({
-            Url = url,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = game:GetService("HttpService"):JSONEncode(data)
-        })
-        Fluent:Notify({Title = "Thành công", Content = "Đã gửi báo cáo về Discord rồi nhé anh Shadow!", Duration = 3})
-    end
-})
+-- [[ LOGIC QUÉT DỮ LIỆU REAL-TIME ]]
+task.spawn(function()
+    while task.wait(1) do
+        pcall(function()
+            local p = game.Players.LocalPlayer
+            -- 1. Cập nhật số liệu cơ bản
+            LevelLabel:SetTitle("Cấp độ: " .. tostring(p.Data.Level.Value))
+            BeliLabel:SetTitle("Tiền Beli: 💵 " .. tostring(p.Data.Beli.Value):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", ""))
+            BountyLabel:SetTitle("Bounty: 🏴‍☠️ " .. tostring(p.leaderstats["Bounty/Honor"].Value))
+            TimeLabel:SetTitle(os.date("Giờ: %X"))
 
--- [[ FIX LỖI TRƯỢT: THÊM 3 Ô TRỐNG CUỐI FILE PHỤ ]]
-Tabs.Webhook:AddSection("— KẾT THÚC —")
+            -- 2. Quét Mirage & Event
+            if game:GetService("Workspace").Map:FindFirstChild("Mirage Island") then
+                MirageLabel:SetTitle("Mirage Island: ✅ ĐÃ XUẤT HIỆN!")
+            else
+                MirageLabel:SetTitle("Mirage Island: ❌ Không thấy")
+            end
+
+            -- 3. Quét Frozen Dimension / Volcano (Quét trong vùng SeaEvents)
+            local seaEvents = game:GetService("Workspace").Map:FindFirstChild("SeaEvents")
+            if seaEvents then
+                if seaEvents:FindFirstChild("Volcano") then VolcanoLabel:SetTitle("Volcano: ✅ ĐANG PHUN TRÀO!") end
+                if seaEvents:FindFirstChild("Frozen") then FrozenLabel:SetTitle("Frozen: ✅ ĐANG MỞ!") end
+            end
+
+            -- 4. Quét Cake Prince
+            local countCake = game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("GetKillingCount") or 0
+            CakeLabel:SetTitle("Cake Prince: " .. tostring(countCake) .. "/500")
+        end)
+    end
+end)
+
+-- [[ FIX LỖI TRƯỢT: THÊM 3 Ô TRỐNG CUỐI FILE ]]
 for i = 1, 3 do
-    Tabs.Webhook:AddSection(" ") 
+    Tabs.StatusServer:AddSection(" ") 
 end
 
--- Lệnh ép SaveManager nhận diện lại để lưu cấu hình link Discord
-pcall(function() 
-    SaveManager:BuildConfigSection(Tabs.Settings) 
-    SaveManager:Save(SaveManager:GetConfigsList()[1] or "Shadow_Premium_Config")
-end)
+-- [[ ÉP LƯU CONFIG ]]
+pcall(function() SaveManager:LoadAutoloadConfig() end)
