@@ -15,7 +15,14 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local VirtualUser = game:GetService("VirtualUser")
 local Lighting = game:GetService("Lighting")
 local CollectionService = game:GetService("CollectionService")
-
+pcall(function()
+    local coreGui = game:GetService("CoreGui")
+    for _, v in pairs(coreGui:GetDescendants()) do
+        if v:IsA("TextLabel") and v.Text == "Banana Cat Hub" then
+            v.Text = "Shadow-Premium"
+        end
+    end
+end)
 -- PLAYER
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui", 5)
@@ -62,7 +69,7 @@ local plr = Player
 local Root = HumanoidRootPart
 
 -- ==========================================
--- LOAD UI LIBRARY (HDanh Hub)
+-- LOAD UI LIBRARY Shadow-Premium Hub)
 -- ==========================================
 Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhhub/UI/refs/heads/main/ui_BananaHub_final.lua"))()
 
@@ -353,7 +360,7 @@ end)
 wait(1)
 
 Library:Notify({
-    Title = "HDanh Hub",
+    Title = "Shadow-Premium Hub",
     Description = "Chào mừng! UI màu hồng đã được load thành công.\nNhấn nút góc trái màn hình để mở GUI.",
     Duration = 4
 })
@@ -2953,17 +2960,10 @@ Tabs.Info:AddButton({
     end
 })
 Tabs.Info:AddButton({
-    ["Title"] = "HDanh Hub",
-    ["Description"] = "Youtube",
+    ["Title"] = "Shadow-Premium Hub",
+    ["Description"] = "tiktok",
     ["Callback"] = function()
-        setclipboard(tostring("https://youtube.com/@nopermc"))
-    end
-})
-Tabs.Info:AddButton({
-    ["Title"] = "HDanh Hub",
-    ["Description"] = "Tiktok",
-    ["Callback"] = function()
-        setclipboard(tostring("www.tiktok.com/@uytins1vn._"))
+        setclipboard(tostring("https://www.tiktok.com/@dofin.shadinone?_r=1&_t=ZS-95hID54VQiF"))
     end
 })
 Tabs.Info:AddParagraph({
@@ -2983,8 +2983,8 @@ if v252 then
     })
 end
 Tabs.Info:AddParagraph({
-    ["Title"] = "Cấp Nhắt",
-    ["Description"] = "Tôi sẽ Cấp nhắt nhiều tính năng hơn trong tương lai"
+    ["Title"] = "Cập Nhật",
+    ["Description"] = "Tôi sẽ Cập Nhật nhiều tính năng hơn trong tương lai"
 })
 Tabs.Info:AddParagraph({
     ["Title"] = "Các Client Android và Ios Hợ Trỡ",
