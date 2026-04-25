@@ -2096,51 +2096,110 @@ local Tabs = {
 }
 
 Window:SelectTab(Tabs.Info)
+
 task.spawn(function()
     pcall(function()
-        -- Đợi cho đến khi bảng Tabs và Tab Info được tạo xong
         repeat task.wait(0.5) until Tabs and Tabs.Info
         
-        local InfoTab = Tabs.Info -- Anh đổi chỗ này thành InfoTab cho khớp với bên dưới
-
-        InfoTab:AddSection("System Info")
-        
-        InfoTab:AddParagraph({
-            Title = "Shadow-Premium Edition",
-            Content = "Welcome To The Script SHADOW-PREMIUM.\nCreator: Kabii\nVersion: 1.0.0"
-        })
-        
-        -- Dùng game.Players.LocalPlayer để lấy tên cho chuẩn Anh nhé
+        local InfoTab = Tabs.Info
         local Player = game.Players.LocalPlayer
-        InfoTab:AddParagraph({
-            Title = "User:", 
-            Content = Player.Name .. " (@" .. Player.DisplayName .. ")" 
+        local StatsService = game:GetService("Stats")
+        local Lighting = game:GetService("Lighting")
+        local StartTime = tick()
+        
+        -- Lưu số tiền gốc để tính toán thống kê
+        local StartBeli = Player.Data.Beli.Value
+        local StartFrag = Player.Data.Fragments.Value
+
+        -- --- PHẦN 1: PERFORMANCE & TIME ⚡ ---
+        InfoTab:AddSection("📊 System Performance")
+        local PerfPara = InfoTab:AddParagraph({
+            Title = "Live Stats",
+            Content = "⚡ FPS: Calculating...\n📶 Ping: Calculating...\n⏳ Uptime: 00h 00m 00s\n⏰ Time: 00:00:00"
+        })
+
+        -- --- PHẦN 2: MOON & ISLANDS 🌕 ---
+        InfoTab:AddSection("🌕 World Events")
+        local MoonPara = InfoTab:AddParagraph({
+            Title = "Moon Status",
+            Content = "✨ Status: Checking...\n📈 Progress: ...%\n💬 Next: ..."
         })
         
-        InfoTab:AddSection("More Info")
-        
-        InfoTab:AddParagraph({
-            Title = "Device:", 
-            Content = "Mobile/PC Optimized"
+        local EventPara = InfoTab:AddParagraph({
+            Title = "Island Status",
+            Content = "🏝️ Mirage: Checking...\n🦖 Prehistoric: Checking...\n❄️ Frozen: Checking...\n🦊 Kitsune Shrine: Checking..."
         })
-        
-        InfoTab:AddParagraph({
-            Title = "STATUS SYSTEMS",
-            Content = "Fast Attack: Enabled Always \nCheck Executor: Completed"
+
+        -- --- PHẦN 3: ACCOUNT INFO 💰 ---
+        InfoTab:AddSection("💰 Account Status")
+        local AccountPara = InfoTab:AddParagraph({
+            Title = "Current Balance",
+            Content = "💵 Beli: Loading...\n💜 Fragments: Loading..."
         })
-        
+
+        -- --- PHẦN 4: SESSION STATISTICS (CUỐI CÙNG TRÊN DISCORD) 📈 ---
+        InfoTab:AddSection("📈 Session Statistics")
+        local SessionPara = InfoTab:AddParagraph({
+            Title = "Earned This Session",
+            Content = "💵 Beli Gained: 0\n💜 Frag Gained: 0"
+        })
+
+        -- --- PHẦN 5: SUPPORT 💬 ---
+        InfoTab:AddSection("💬 Support")
         InfoTab:AddButton({
             Title = "Link Discord SHADOW",
-            Description = "If you need anything, you can contact me via Discord",
+            Description = "Contact Kabii for support",
             Callback = function()
                 setclipboard("https://discord.com/users/1272477314843807778")
-                Fluent:Notify({
-                    Title = "Shadow-Premium",
-                    Content = "Đã sao chép link Discord!",
-                    Duration = 5
-                })
+                Fluent:Notify({Title = "Shadow-Premium", Content = "Đã sao chép link Discord!", Duration = 5})
             end
         })
+
+        -- --- VÒNG LẶP CẬP NHẬT TỔNG LỰC ---
+        task.spawn(function()
+            while task.wait(1) do
+                pcall(function()
+                    -- 1. Cập nhật Performance & Giờ thực tế
+                    local fps = math.floor(1 / task.wait())
+                    local ping = math.floor(StatsService.Network.ServerStatsItem["Data Ping"]:GetValue())
+                    local uptime = tick() - StartTime
+                    local hours, mins, secs = math.floor(uptime/3600), math.floor((uptime%3600)/60), math.floor(uptime%60)
+                    local realTime = os.date("%H:%M:%S")
+                    
+                    PerfPara:SetDesc(string.format("⚡ FPS: %d | 📶 Ping: %dms\n⏳ Uptime: %02dh %02dm %02ds\n⏰ Real Time: %s", fps, ping, hours, mins, secs, realTime))
+
+                    -- 2. Moon Logic
+                    local moonIntensity = Lighting.MoonIntensity
+                    local moonPercent = math.floor(moonIntensity * 100)
+                    local moonStatus = (moonPercent >= 100) and "🌕 FULL MOON ACTIVE!" or "🌑 Normal Moon"
+                    local nextMoon = (moonPercent >= 75 and moonPercent < 100) and "⚠️ NEXT NIGHT IS FULL MOON!" or "Waiting for cycle..."
+                    MoonPara:SetDesc(string.format("✨ Status: %s\n📈 Progress: %d%%\n💬 Next: %s", moonStatus, moonPercent, nextMoon))
+
+                    -- 3. Check 4 Đảo (Thêm Đảo Cáo)
+                    local mirage = game:GetService("Workspace").Map:FindFirstChild("Mirage Island") and "✅ Appeared" or "❌ Not Found"
+                    local prehistoric = game:GetService("Workspace").Map:FindFirstChild("Prehistoric Island") and "✅ Appeared" or "❌ Not Found"
+                    local frozen = game:GetService("Workspace").Map:FindFirstChild("Frozen Dimension") and "✅ Appeared" or "❌ Not Found"
+                    local kitsune = game:GetService("Workspace").Map:FindFirstChild("Kitsune Island") or game:GetService("Workspace").Map:FindFirstChild("Kitsune Shrine")
+                    local kitsuneStatus = kitsune and "✅ Appeared" or "❌ Not Found"
+
+                    EventPara:SetDesc(string.format("🏝️ Mirage: %s\n🦖 Prehistoric: %s\n❄️ Frozen: %s\n🦊 Kitsune: %s", mirage, prehistoric, frozen, kitsuneStatus))
+
+                    -- 4. Cập nhật Tiền hiện tại
+                    local currentBeli = Player.Data.Beli.Value
+                    local currentFrag = Player.Data.Fragments.Value
+                    AccountPara:SetDesc(string.format("💵 Beli: %s\n💜 Fragments: %s", 
+                        tostring(currentBeli):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", ""), 
+                        tostring(currentFrag):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")))
+
+                    -- 5. Thống kê Session (Số tiền đã kiếm được)
+                    local gainedBeli = currentBeli - StartBeli
+                    local gainedFrag = currentFrag - StartFrag
+                    SessionPara:SetDesc(string.format("💵 Beli Gained: +%s\n💜 Frag Gained: +%s", 
+                        tostring(gainedBeli):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", ""), 
+                        tostring(gainedFrag):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")))
+                end)
+            end
+        end)
     end)
 end)
 
